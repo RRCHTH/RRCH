@@ -1,0 +1,242 @@
+local OrionLib = loadstring(game:HttpGet(('https://pastebin.com/raw/0wyQdQsk')))()
+local Window = OrionLib:MakeWindow({Name = "Arcane Odyssey", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+local KillAura_Distance = 1000
+local Boss = "King Calvus"
+
+local Tab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+Tab:AddToggle({
+	Name = "Kill Aura",
+	Default = false,
+	Callback = function(Value)
+	    if Value then
+            local M1 = "[\"Blast\",1,20,20,true,\"Right Hand Across\",\"(None)\",\"Phoenix\",\"Phoenix\","
+            local Str = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.UI.Info.Magic.List.Magic1.Frame.MagicName.Text
+            local Str1, Str2 = Str:match("(.+) (.+)")
+            
+            _G.KillAura = true
+            while _G.KillAura do wait(0.25)
+                pcall(function()
+                    for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") then
+                            if (v.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).magnitude < 1000 and v.Humanoid.Health > 0 then
+                                game:GetService("ReplicatedStorage").RS.Remotes.Magic.DealAttackDamage:FireServer(game:GetService("Players").LocalPlayer.Character,v,Str,"1",M1.."\""..Str1.."\"]",100)
+                            end
+                        end
+                    end
+                end)
+            end
+	    elseif not Value then
+	        _G.KillAura = false
+	    end
+	end
+})
+Tab:AddSlider({
+	Name = "Kill Aura Distance",
+	Min = 100,
+	Max = 1000,
+	Default = 1000,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 50,
+	ValueName = "Distance",
+	Callback = function(Value)
+		KillAura_Distance = Value
+	end
+})
+Tab:AddButton({
+	Name = "God Mode",
+	Callback = function()
+      	local player = game.Players.LocalPlayer
+        local namecall; namecall = hookmetamethod(game, '__namecall', function(object, ...)
+        local args = {...}
+            if getnamecallmethod() == "FireServer" then
+                if object.Name == 'DealWeaponDamage' and args[3] == player.Character then
+                    args[3] = math.random(1,200);
+                elseif object.Name == 'DealStrengthDamage' and args[3] == player.Character then
+                    args[3] = math.random(1,200);
+                 elseif object.Name == 'DealAttackDamage' and args[2] == player.Character then
+                    args[2] = math.random(1,200);
+                 elseif object.Name == 'DealBossDamage' and args[2] == player.Character then
+                    args[2] = math.random(1,200);
+                end;
+            end;
+            return namecall(object, unpack(args));
+        end);
+  	end    
+})
+Tab:AddToggle({
+	Name = "Auto Eat",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+		    local Lists = {}
+		    local Eat = true
+		    
+            _G.AutoEat = true
+            while _G.AutoEat do wait(0.1)
+                pcall(function()
+                    for i, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Backpack.Backpack.Inventory.ScrollingFrame.UIGridFrame:GetChildren()) do
+                        if v.ClassName == "TextButton" and v.View:FindFirstChild("HungerIcon") then
+                            table.insert(Lists, v.Tool.Value.Name)
+                        end
+                    end
+                    local hungerLevel = tonumber(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.UI.HUD.Anchor.HungerBar.Back.Amount.Text)
+                    if hungerLevel and hungerLevel < 100 then
+                        for i, v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+                            if table.find(Lists, v.Name) and Eat then
+                                Eat = false
+                                game:GetService("ReplicatedStorage").RS.Remotes.Misc.ToolAction:FireServer(v)
+                            end
+                        end
+                        Eat = true
+                    end 
+                end)
+            end
+		elseif not Value then
+	        _G.AutoEat = false
+		end
+	end    
+})
+local Tab = Window:MakeTab({
+	Name = "Boss Farm",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+Tab:AddDropdown({
+	Name = "Boss List",
+	Default = "King Calvus",
+	Options = {"King Calvus","General Argos","Lord Elius","Architect Merlot","Commodore Kai"},
+	Callback = function(Value)
+		Boss = Value
+	end    
+})
+Tab:AddButton({
+	Name = "TP to Boss",
+	Callback = function()
+	    local Player = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+	    local WS = game:GetService("Workspace").Map
+	    
+        if Boss == "King Calvus" then
+            Player.CFrame = CFrame.new(16587, 567.170044, 2252.99976, 0.951058745, 5.16423215e-09, -0.309010208, -5.55948088e-09, 1, -3.98564237e-10, 0.309010208, 2.09699436e-09, 0.951058745) wait()
+            Player.Anchored = true wait()
+            repeat wait(0.1) until WS.Ravenna.DetailsLoaded.Value == true and WS.Ravenna:FindFirstChild("Fragmentable")
+            Player.Anchored = false
+        elseif Boss == "General Argos" then
+            Player.CFrame = CFrame.new(10759.999, 432.968689, 128.999847, -0.989713073, -5.58314239e-09, -0.143066391, 1.19108119e-08, 1, -1.21422147e-07, 0.143066391, -1.21877122e-07, -0.989713073) wait()
+            Player.Anchored = true wait()
+            repeat wait(0.1) until WS["Fort Talos"].DetailsLoaded.Value == true and WS["Fort Talos"]:FindFirstChild("Fragmentable")
+            Player.Anchored = false
+        elseif Boss == "Lord Elius" then
+            Player.CFrame = CFrame.new(7443.11621, 2620.20532, 1186.31677, -0.974759042, -7.07745897, -0.223259434, -7.03521366e-08, 1, -9.8459676e-09, 0.223259434, 6.1093326e-09, -0.974759042) wait()
+            Player.Anchored = true wait()
+            repeat wait(0.1) until WS["Djin Ruins"].DetailsLoaded.Value == true and WS["Djin Ruins"]:FindFirstChild("Fragmentable")
+            Player.Anchored = false
+        elseif Boss == "Architect Merlot" then
+            Player.CFrame = CFrame.new(4688.00049, 483.970154, -85.0002441, -0.989815116, 2.9981434e-10, 0.14235884, 1.06529976e-08, 1, 7.19638038e-08, -0.14235884, 7.27474117e-08, -0.989815116) wait()
+            Player.Anchored = true wait()
+            repeat wait(0.1) until WS.Whitesummit.DetailsLoaded.Value == true and WS.Whitesummit:FindFirstChild("Fragmentable")
+            Player.Anchored = false
+        elseif Boss == "Commodore Kai" then
+            Player.CFrame = CFrame.new(7396.99951, 475.165771, 3847, -0.295149803, 1.06083042e-09, -0.955451012, -4.97058006e-10, 1, 1.2638397e-09, 0.955451012, 8.4793661e-10, -0.295149803) wait()
+            Player.Anchored = true wait()
+            repeat wait(0.1) until WS.Silverhold.DetailsLoaded.Value == true and WS.Silverhold:FindFirstChild("Fragmentable")
+            Player.Anchored = false
+        end
+  	end    
+})
+local Tab = Window:MakeTab({
+	Name = "Auto Fish",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+Tab:AddButton({
+    Name = "TP to Elm Island",
+    Callback = function()
+        local Player = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+        local WS = game:GetService("Workspace").Map
+        
+        Player.CFrame = CFrame.new(-494.004456, 426.505615, 6472.00684, -0.320566475, -6.81225529e-08, 0.947225988, 3.29641239e-08, 1, 8.30738855e-08, -0.947225988, 5.78551784e-08, -0.320566475) wait()
+        Player.Anchored = true wait()
+        repeat wait(0.1) until WS["Elm Island"].DetailsLoaded.Value == true and WS["Elm Island"]:FindFirstChild("Fragmentable")
+        Player.Anchored = false
+    end
+})
+Tab:AddToggle({
+	Name = "Auto Fish",
+	Default = false,
+	Callback = function(Value)
+        if Value then
+            local PLC = game:GetService("Players").LocalPlayer.Character
+            local RS = game:GetService("ReplicatedStorage").RS.Remotes.Misc.ToolAction
+            
+            _G.AutoFish = true
+            while _G.AutoFish do wait(0.1)
+                pcall(function()
+                    if PLC:FindFirstChild("Magnetic Collector's Rod") and not PLC:FindFirstChild("BobberVal") then
+                        RS:FireServer(PLC:FindFirstChild("Magnetic Collector's Rod"))
+                    elseif PLC:FindFirstChild("FishBiteGoal") or PLC:FindFirstChild("FishBiteProgress") then
+                        repeat wait(0.1)
+                            RS:FireServer(PLC:FindFirstChild("Magnetic Collector's Rod"))
+                        until not PLC:FindFirstChild("FishBiteGoal") or not PLC:FindFirstChild("FishBiteProgress"); wait(2)
+                    end
+                end)
+            end
+        elseif not Value then
+            _G.AutoFish = false
+        end
+	end    
+})
+
+Tab:AddToggle({
+    Name = "Auto Move",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            local PC = game:GetService("Players").LocalPlayer.Character
+            local Pos1 = PC.HumanoidRootPart.Position
+            local Pos2 = (PC.HumanoidRootPart.CFrame + PC.HumanoidRootPart.CFrame.lookVector * 20)
+            
+            _G.AutoMove = true
+            while _G.AutoMove do wait(0.1)
+                pcall(function()
+                    if (Pos1 - PC.HumanoidRootPart.Position).magnitude > 10 then
+                        PC.Humanoid:MoveTo(Pos1)
+                        PC.Humanoid.MoveToFinished:Wait()
+                        local chrPos = PC.PrimaryPart.Position
+                        local tPos = Pos2
+                        local modTPos = Vector3.new(tPos.X,chrPos.Y,tPos.Z)
+                        local newCF = CFrame.new(chrPos,modTPos)
+                        PC:SetPrimaryPartCFrame(newCF)
+                    end
+                end)
+            end
+        elseif not Value then
+            _G.AutoMove = false
+        end
+    end    
+})
+Tab:AddToggle({
+    Name = "Remove Fish",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            _G.RemoveFish = true
+            while _G.RemoveFish do wait(0.1)
+                pcall(function()
+                    for i,v in pairs(game:GetService("Workspace").Effects:GetChildren()) do
+                        if v.Name == "Part0" and v.Name == "Bag" then
+                            v:Destroy()
+                        end
+                    end
+                end)
+            end
+        elseif not Value then
+            _G.RemoveFish = false
+        end
+    end
+})
+OrionLib:Init()
